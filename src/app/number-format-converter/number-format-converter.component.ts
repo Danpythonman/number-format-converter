@@ -7,16 +7,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NumberFormatConverterComponent implements OnInit {
 
+    binaryFormat: string = "";
+    decimalFormat: string = "";
+    hexadecimalFormat: string = "";
+
+    binaryWithSpaces: string = "";
+
     constructor() { }
 
     ngOnInit(): void {
     }
 
-    static decimalToBinary(inputString: string) {
+    decimalToBinary(inputString: string) {
         /** Returns the binary format of the input decimal-format input number */
 
         // Convert the input decimal number from string to number
         let decimalNumber = +inputString;
+
+        // Check if number is 0
+        if (decimalNumber == 0) {
+            this.binaryFormat = "0000"
+            this.formatBinaryWithSpaces(this.binaryFormat);
+            return this.binaryFormat
+        }
 
         /** Converting to binary */
 
@@ -26,13 +39,13 @@ export class NumberFormatConverterComponent implements OnInit {
 
         // Get the binary digits in an array
         while (decimalPlaceholder != 0) {
-                if (decimalPlaceholder % 2 == 0) {
-                        binaryDigitList.push("0");
-                }
-                else {
-                        binaryDigitList.push("1");
-                }
-                decimalPlaceholder = Math.floor(decimalPlaceholder / 2);
+            if (decimalPlaceholder % 2 == 0) {
+                binaryDigitList.push("0");
+            }
+            else {
+                binaryDigitList.push("1");
+            }
+            decimalPlaceholder = Math.floor(decimalPlaceholder / 2);
         }
 
         // Add zeros to the beginning of the string to make the string a multiple of four
@@ -45,10 +58,12 @@ export class NumberFormatConverterComponent implements OnInit {
                 binaryFormat += binaryDigitList[i];
         }
 
+        this.binaryFormat = binaryFormat;
+
         return binaryFormat;
     }
 
-    static hexadecimalToBinary(inputString: string) {
+    hexadecimalToBinary(inputString: string) {
         /** Returns the binary format of the input hexadecimal-format number */
 
         let binaryFormat: string = "";
@@ -73,10 +88,13 @@ export class NumberFormatConverterComponent implements OnInit {
                 case "f": {binaryFormat += "1111"; break;}
                 }
         }
+
+        this.binaryFormat = binaryFormat;
+
         return binaryFormat;
     }
 
-    static binaryToDecimal(inputString: string) {
+    binaryToDecimal(inputString: string) {
         /** Returns the decimal format of the input binary-format number */
 
         // Add zeros to the beginning of the string to make the string a multiple of four
@@ -96,10 +114,12 @@ export class NumberFormatConverterComponent implements OnInit {
 
         decimalFormat = decimalNumber.toString();
 
+        this.decimalFormat = decimalFormat;
+
         return decimalFormat;
     }
 
-    static binaryToHexadecimal(inputString: string) {
+    binaryToHexadecimal(inputString: string) {
         /** Returns the hexadecimal format of the input binary-format number */
 
         // Add zeros to the beginning of the string to make the string a multiple of four
@@ -112,7 +132,7 @@ export class NumberFormatConverterComponent implements OnInit {
         let hexadecimalFormat: string = "";
 
         for (let i = 0; i < inputString.length; i += 4) {
-            switch (inputString.substr(i, i + 4)) {
+            switch (inputString.substr(i, 4)) {
                 case "0001": {hexadecimalFormat += "1"; break;}
                 case "0000": {hexadecimalFormat += "0"; break;}
                 case "0010": {hexadecimalFormat += "2"; break;}
@@ -131,10 +151,13 @@ export class NumberFormatConverterComponent implements OnInit {
                 case "1111": {hexadecimalFormat += "f"; break;}
                 }
         }
+
+        this.hexadecimalFormat = hexadecimalFormat;
+
         return hexadecimalFormat;
     }
 
-    static formatBinaryWithSpaces(binaryWithoutSpaces: string) {
+    formatBinaryWithSpaces(binaryWithoutSpaces: string) {
         /** Adds spaces to binary format */
 
         let binaryWithSpaces: string = "";
@@ -151,10 +174,12 @@ export class NumberFormatConverterComponent implements OnInit {
             binaryWithSpaces += binaryWithoutSpaces.charAt(i);
         }
 
+        this.binaryWithSpaces = binaryWithSpaces;
+
         return binaryWithSpaces;
     }
 
-    static fullConvert(inputNumber: string, inputFormatType: string) {
+    fullConvert(inputNumber: string, inputFormatType: string) {
         /* Returns list of the two converted formats based on the input format.
          * The format with the lower number base will be first in the list.
          */
@@ -163,20 +188,66 @@ export class NumberFormatConverterComponent implements OnInit {
 
         if (inputFormatType == "b") {
             /** Convert from binary to decimal and hexadecimal */
-            outputNumbers = [this.binaryToDecimal(inputNumber),
-                this.binaryToHexadecimal(inputNumber)];
+
+            // Check if input string is empty
+            if (inputNumber == "") {
+                this.binaryFormat = "";
+                this.binaryWithSpaces = "";
+                this.decimalFormat = "";
+                this.hexadecimalFormat = "";
+            }
+            else {
+                // Remove unnecessary spaces
+                this.binaryFormat = inputNumber.replace(/\s/g, "");
+                // // Get the string with spaces
+                // this.binaryWithSpaces = this.formatBinaryWithSpaces(this.binaryFormat);
+
+                outputNumbers = [this.binaryToDecimal(this.binaryFormat),
+                    this.binaryToHexadecimal(this.binaryFormat)];
+
+                this.decimalFormat = outputNumbers[0];
+                this.hexadecimalFormat = outputNumbers[1];
+            }
         }
         else if (inputFormatType == "d") {
             /** Convert from decimal to binary and hexadecimal */
-            let binaryNumber = this.decimalToBinary(inputNumber);
-            outputNumbers = [this.formatBinaryWithSpaces(binaryNumber),
-                this.binaryToHexadecimal(binaryNumber)]
+
+            // Check if input string is empty
+            if (inputNumber == "") {
+                this.decimalFormat = "";
+                this.binaryFormat = "";
+                this.binaryWithSpaces = "";
+                this.hexadecimalFormat = "";
+            }
+            else {
+                let binaryNumber = this.decimalToBinary(inputNumber);
+                outputNumbers = [this.formatBinaryWithSpaces(binaryNumber),
+                    this.binaryToHexadecimal(binaryNumber)]
+
+                this.decimalFormat = inputNumber;
+                this.binaryFormat = outputNumbers[0];
+                this.hexadecimalFormat = outputNumbers[1];
+            }
         }
         else if (inputFormatType == "x") {
             /** Convert from hexadecimal to binary and decimal */
-            let binaryNumber = this.hexadecimalToBinary(inputNumber);
-            outputNumbers = [this.formatBinaryWithSpaces(binaryNumber),
-                this.binaryToDecimal(binaryNumber)];
+
+            // Check if input string is empty
+            if (inputNumber == "") {
+                this.hexadecimalFormat = "";
+                this.binaryFormat = "";
+                this.binaryWithSpaces = "";
+                this.decimalFormat = "";
+            }
+            else {
+                let binaryNumber = this.hexadecimalToBinary(inputNumber);
+                outputNumbers = [this.formatBinaryWithSpaces(binaryNumber),
+                    this.binaryToDecimal(binaryNumber)];
+
+                this.hexadecimalFormat = inputNumber;
+                this.binaryFormat = outputNumbers[0];
+                this.decimalFormat = outputNumbers[1];
+            }
         }
         return outputNumbers;
     }

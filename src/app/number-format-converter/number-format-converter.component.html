@@ -1,1 +1,12 @@
-<p>number-format-converter works!</p>
+<div id="decimal_div" style="float:left; margin-right:20px;">
+    <p>Decimal</p>
+    <input type="text" id="decimal_number" value="{{ this.decimalFormat }}" #decimalInput (keyup)="fullConvert(decimalInput.value, 'd')">
+</div>
+<div id="binary_div" style="float:left; margin-right:20px;">
+    <p>Binary</p>
+    <input type="text" id="binary_number" value="{{ this.binaryWithSpaces }}" #binaryInput (keyup)="fullConvert(binaryInput.value, 'b')">
+</div>
+<div id="hexadecimal_div" style="float:left">
+    <p>Hexadecimal</p>
+    <input type="text" id="hexadecimal_number" value="{{ this.hexadecimalFormat }}" #hexadecimalInput (keyup)="fullConvert(hexadecimalInput.value, 'x')">
+</div>
